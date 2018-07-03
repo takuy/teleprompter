@@ -10,7 +10,7 @@ $(function () {
   var $forward = $('.forward');
   var down = false;
   var speed = 0;
-
+  var unique = Date.now();
   FastClick.attach(document.body);
 
   $source
@@ -21,11 +21,32 @@ $(function () {
     .on('open', function () {
       $statusIndicator.removeClass('error');
       $statusIndicator.addClass('open');
+    })
+    .on('speed', function (event) {
+      var data = JSON.parse(event.originalEvent.data);
+      if(unique == data.unqiue) return;
+
+      if(data.speed > 0) {
+        if ($play.hasClass('paused')) {
+          $play.removeClass('paused');
+          $speed.removeClass('paused');
+        }
+
+      } else if(data.speed==0){
+
+        if (!$play.hasClass('paused')) {
+          $play.addClass('paused');
+          $speed.addClass('paused');
+        }
+      }
+      setSpeed(Math.pow(data.ospeed, 1/2), true);
+
     });
 
   setSpeed(0.5);
 
   function postEvent(body) {
+    body.unique = unique;
     return fetch('events', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -43,8 +64,8 @@ $(function () {
       });
   }
 
-  var postSpeedEvent = util.debounce(function postSpeedEvent(speed) {
-    postEvent({ type: 'speed', speed: speed });
+  var postSpeedEvent = util.debounce(function postSpeedEvent(postSpeed) {
+    postEvent({ type: 'speed', speed: postSpeed, ospeed: speed });
   }, {
     delay: 100
   });
@@ -56,7 +77,7 @@ $(function () {
     setSpeed(pct);
   }
 
-  function setSpeed(normal) {
+  function setSpeed(normal, noPost) {
     normal = Math.max(Math.min(normal, 1), 0);
 
     $speedIndicator.css('left', normal * 100 + '%');
@@ -64,7 +85,7 @@ $(function () {
 
     speed = Math.pow(normal, 2);
 
-    if (!$play.hasClass('paused')) {
+    if (!noPost && !$play.hasClass('paused')) {
       postSpeedEvent(speed);
     }
   }
@@ -112,9 +133,9 @@ $(function () {
     $speed.toggleClass('paused');
 
     if ($play.hasClass('paused')) {
-      postEvent({ type: 'speed', speed: 0 });
+      postEvent({ type: 'speed', speed: 0, ospeed: speed });
     } else {
-      postEvent({ type: 'speed', speed: speed });
+      postEvent({ type: 'speed', speed: speed, ospeed: speed });
     }
   });
 
