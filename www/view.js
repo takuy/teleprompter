@@ -32,10 +32,11 @@ $(function () {
     })
     .on('speed', function (event) {
       var data = JSON.parse(event.originalEvent.data);
+      if(data.unique > 0) {
+        speedVec = data.speed;
 
-      speedVec = data.speed;
-
-      recalculateAnimation();
+        recalculateAnimation();
+      }
     })
     .on('jump', function (event) {
       var data = JSON.parse(event.originalEvent.data);
