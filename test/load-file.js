@@ -2,7 +2,6 @@
 
 var path = require('path');
 var stream = require('stream');
-var Promise = require('bluebird');
 var loadStreamBody = require('raw-body');
 var tape = require('tape');
 var createLoadFile = require('../lib/load-file');

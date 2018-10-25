@@ -1,5 +1,6 @@
 $(function () {
-  var $source = $(new EventSource(String(window.location) + '/events'));
+  var file_name = /*$("#file").val() ||*/ String(window.location)
+  var $source = $(new EventSource(file_name + '/events'));
   var $content = $('.content');
   var $flipButton = $('.flip-button');
   var $contentContainer = $('.content-container');

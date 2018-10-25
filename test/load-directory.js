@@ -1,7 +1,6 @@
 'use strict';
 
 var path = require('path');
-var Promise = require('bluebird');
 var tape = require('tape');
 var createLoadDirectory = require('../lib/load-directory');
 var createResolver = require('../lib/resolve-path');
