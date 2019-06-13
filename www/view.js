@@ -9,6 +9,8 @@ $(function () {
   var speedVec = 0;
   var MAX_SPEED = 300;
 
+  var flipped = 0;
+
   FastClick.attach(document.body);
 
   $source
@@ -40,6 +42,9 @@ $(function () {
       }
     })
     .on('jump', function (event) {
+      if (flipped) {
+        $contentContainer.removeClass('flip-y');
+      }
       var data = JSON.parse(event.originalEvent.data);
       var targetTop = $content.offset().top - $content.position().top;
       var minimum = $('.indicator').innerHeight() / 2;
@@ -58,7 +63,9 @@ $(function () {
             deltaTop = elTop;
           }
         });
-
+      if (flipped) {
+        $contentContainer.addClass('flip-y');
+      }
       if (deltaTop) {
         setDelta(0);
         setPosition(getPosition() + deltaTop * data.direction);
@@ -66,18 +73,22 @@ $(function () {
       }
     });
 
-  $contentContainer.toggleClass('flip-y', Boolean(Number(localStorage.getItem('flip'))));
+  $contentContainer.toggleClass('flip-y', flipped = Boolean(Number(localStorage.getItem('flip'))));
   $flipButton.click(function () {
     $contentContainer.toggleClass('flip-y');
-    localStorage.setItem('flip', Number($contentContainer.hasClass('flip-y')));
+    localStorage.setItem('flip', flipped = Number($contentContainer.hasClass('flip-y')));
   });
 
   function getPosition() {
-    return $content.position().top * -1;
+    var pos = $content.position().top * -1;
+    if (flipped) {
+      pos = $content.height() - pos;
+    }
+    return pos;
   }
 
   function setPosition(distance) {
-    $content.css('transform', 'translate3d(0, -' + distance + 'px, 0)');
+    $content.css('transform', 'translate3d(0, ' + -distance + 'px, 0)');
   }
 
   function setDelta(delta) {
